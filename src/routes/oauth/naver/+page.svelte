@@ -1,3 +1,74 @@
+<!-- (3) LoginWithNaverId Javscript 설정 정보 및 초기화 -->
+<script>
+    import { onMount } from "svelte";
+
+    onMount(()=>{
+        window.name='opener';
+        var naverLogin = new naver.LoginWithNaverId(
+            {
+                clientId: "",
+                callbackUrl: "http://" + window.location.hostname + ((location.port==""||location.port==undefined)?"":":" + location.port) + "/oauth/naver/info",
+                isPopup: true,
+                loginButton: {color: "green", type: 3, height: 60}
+            }
+        );
+        /* (4) 네아로 로그인 정보를 초기화하기 위하여 init을 호출 */
+        naverLogin.init();
+        
+        
+        /* (4-1) 임의의 링크를 설정해줄 필요가 있는 경우 */
+        // $("#gnbLogin").attr("href", naverLogin.generateAuthorizeUrl());
+        document.getElementById("gnbLogin").setAttribute("href", naverLogin.generateAuthorizeUrl());
+        
+
+        /* (5) 현재 로그인 상태를 확인 */
+        // window.addEventListener('load', function () {
+            console.log('test3');
+            naverLogin.getLoginStatus(function (status) {
+                if (status) {
+                    console.log('test2');
+                    /* (6) 로그인 상태가 "true" 인 경우 로그인 버튼을 없애고 사용자 정보를 출력합니다. */
+                    setLoginStatus();
+                }
+            });
+        // });
+        console.log('test1');
+        /* (6) 로그인 상태가 "true" 인 경우 로그인 버튼을 없애고 사용자 정보를 출력합니다. */
+        function setLoginStatus() {
+            var profileImage = naverLogin.user.getProfileImage();
+            var nickName = naverLogin.user.getNickName();
+            var Mobile = naverLogin.user.getMobile();
+            console.log(Mobile);
+            var imageViewer = '';
+            if (profileImage) {
+                imageViewer += '<br><br><img src="' + profileImage + '" height=50 /> <p>';
+            }
+            // $("#naverIdLogin_loginButton").html(imageViewer + nickName + '님 반갑습니다.</p>');
+            document.getElementById("naverIdLogin_loginButton").innerHTML = imageViewer + nickName + '님 반갑습니다.</p>';
+            // $("#gnbLogin").html("Logout");
+            document.getElementById("gnbLogin").innerHTML = "Logout";
+            // $("#gnbLogin").attr("href", "#");
+            document.getElementById("gnbLogin").setAttribute("href", "#");
+
+            document.getElementById("Mobile").innerHTML = Mobile;
+            /* (7) 로그아웃 버튼을 설정하고 동작을 정의합니다. */
+            // $("#gnbLogin").click(function (e) {
+            //     e.preventDefault();
+            //     naverLogin.logout();
+            //     location.replace('/oauth/sample/javascript_sample.html');
+            // });
+            document.getElementById("gnbLogin").addEventListener('click', function (e) {
+                console.log('test5');
+                e.preventDefault();
+                naverLogin.logout();
+                location.replace('/oauth/naver');
+            });
+        }
+    });
+    
+</script>
+
+
 
 <div class="container">
     <div class="header clearfix">
@@ -16,7 +87,7 @@
         <!-- (1) 버튼 event 처리를 위하여 id를 지정 id=loginButton -->
         <p>
             <div id="naverIdLogin"><a id="naverIdLogin_loginButton" href="#" role="button"><img src="https://static.nid.naver.com/oauth/big_g.PNG" width=320></a></div>
-        
+            <div id="Mobile"></div>
     </div>
 
     <div class="row marketing">
@@ -42,68 +113,3 @@
     </footer>
 
 </div>
-<!-- /container -->
-
-
-
-<!-- (3) LoginWithNaverId Javscript 설정 정보 및 초기화 -->
-<script>
-    import { onMount } from "svelte";
-
-    onMount(() => {
-        window.name='opener';
-    var naverLogin = new naver.LoginWithNaverId(
-        {
-            clientId: "",
-            callbackUrl: "http://" + window.location.hostname + ((location.port==""||location.port==undefined)?"":":" + location.port) + "/oauth/naver/info",
-            isPopup: true,
-            loginButton: {color: "green", type: 3, height: 60}
-        }
-    );
-    /* (4) 네아로 로그인 정보를 초기화하기 위하여 init을 호출 */
-    naverLogin.init();
-    
-    /* (4-1) 임의의 링크를 설정해줄 필요가 있는 경우 */
-    // $("#gnbLogin").attr("href", naverLogin.generateAuthorizeUrl());
-    document.getElementById("gnbLogin").setAttribute("href", naverLogin.generateAuthorizeUrl());
-
-    /* (5) 현재 로그인 상태를 확인 */
-    window.addEventListener('load', function () {
-        naverLogin.getLoginStatus(function (status) {
-            if (status) {
-                /* (6) 로그인 상태가 "true" 인 경우 로그인 버튼을 없애고 사용자 정보를 출력합니다. */
-                setLoginStatus();
-            }
-        });
-    });
-
-    /* (6) 로그인 상태가 "true" 인 경우 로그인 버튼을 없애고 사용자 정보를 출력합니다. */
-    function setLoginStatus() {
-        var profileImage = naverLogin.user.getProfileImage();
-        var nickName = naverLogin.user.getNickName();
-        var imageViewer = '';
-        if (profileImage) {
-            imageViewer += '<br><br><img src="' + profileImage + '" height=50 /> <p>';
-        }
-        // $("#naverIdLogin_loginButton").html(imageViewer + nickName + '님 반갑습니다.</p>');
-        document.getElementById("naverIdLogin_loginButton").innerHTML = imageViewer + nickName + '님 반갑습니다.</p>';
-        // $("#gnbLogin").html("Logout");
-        document.getElementById("gnbLogin").innerHTML = "Logout";
-        // $("#gnbLogin").attr("href", "#");
-        document.getElementById("gnbLogin").setAttribute("href", "#");
-        /* (7) 로그아웃 버튼을 설정하고 동작을 정의합니다. */
-        // $("#gnbLogin").click(function (e) {
-        //     e.preventDefault();
-        //     naverLogin.logout();
-        //     location.replace('/oauth/sample/javascript_sample.html');
-        // });
-        document.getElementById("gnbLogin").addEventListener('click', function (e) {
-            e.preventDefault();
-            naverLogin.logout();
-            location.replace('/oauth/naver');
-        });
-    }
-    });
-
-
-</script>
